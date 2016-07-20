@@ -61,6 +61,9 @@ func Dial(network, address string) (Conn, error) {
 }
 
 func (c *conn) DoTimer(t miniprofiler.Timer, commandName string, args ...interface{}) (reply interface{}, err error) {
+	if t == nil {
+		return c.Conn.Do(commandName, args...)
+	}
 	t.StepCustomTiming("redis", "do", format(commandName, args...), func() {
 		reply, err = c.Conn.Do(commandName, args...)
 	})
@@ -68,6 +71,9 @@ func (c *conn) DoTimer(t miniprofiler.Timer, commandName string, args ...interfa
 }
 
 func (c *conn) SendTimer(t miniprofiler.Timer, commandName string, args ...interface{}) (err error) {
+	if t == nil {
+		return c.Conn.Send(commandName, args...)
+	}
 	t.StepCustomTiming("redis", "send", format(commandName, args...), func() {
 		err = c.Conn.Send(commandName, args...)
 	})
